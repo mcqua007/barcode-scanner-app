@@ -189,11 +189,26 @@
                             console.log(result)
                             document.getElementById('result').textContent = result.text
                             //Todo: check to see if within a min and same barcode and don't push
-                            items.push({
-                                barcode: result.text,
-                                date: result.timestamp
+                            var index = items.findIndex((el) => {
+                                return el.barcode === result.text
                             });
-                            localStorage.setItem('items', JSON.stringify(items));
+                            if (index !== -1) {
+                                let date = new Date(items[index].date).toLocaleString();
+                                var replace = confirm(
+                                    `This was item was last scanned - ${date} ? Do you want to replace?`
+                                    );
+                                if (replace) {
+                                    items[index].date = result.timestamp;
+                                    localStorage.setItem('items', JSON.stringify(
+                                    items));
+                                }
+                            } else {
+                                items.push({
+                                    barcode: result.text,
+                                    date: result.timestamp
+                                });
+                                localStorage.setItem('items', JSON.stringify(items));
+                            }
                         }
                         if (err && !(err instanceof ZXing.NotFoundException)) {
                             console.error(err)
