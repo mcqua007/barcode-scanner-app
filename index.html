@@ -110,6 +110,10 @@
     .source-wrapper select {
         border: none;
     }
+
+    .items-wrapper {
+        margin: 15px 0;
+    }
 </style>
 
 <body>
@@ -129,6 +133,8 @@
             <div>Result:</div>
             <pre><code id="result"></code></pre>
         </div>
+        <ul class="items-wrapper" id="items">
+        </ul>
     </div>
     <!--[if lt IE 7]>
             <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.</p>
@@ -139,6 +145,17 @@
     <!-- <script src="https://cdn.jsdelivr.net/npm/scandit-sdk@5.x"></script> -->
     <script type="text/javascript" src="https://unpkg.com/@zxing/library@latest"></script>
     <script type="text/javascript">
+        //saved items 
+        var items = localStorage.getItem('items') ? JSON.parse(localStorage.getItem('items')) : [];
+        if (items.length > 0) {
+            let el = document.querySelector('#items');
+            var html = ``;
+            items.forEach(item => {
+                let date = new Date(item.date).toLocaleString();
+                html += `<li>Item: ${item.barcode} | ${date}</li>`;
+            });
+            el.innerHTML = html;
+        }
         window.addEventListener('load', function () {
             var videoEl = document.querySelector('#video');
             videoEl.addEventListener('loadeddata', (event) => {
@@ -170,6 +187,12 @@
                         if (result) {
                             console.log(result)
                             document.getElementById('result').textContent = result.text
+                            //Todo: check to see if within a min and same barcode and don't push
+                            items.push({
+                                barcode: result.text,
+                                date: result.timestamp
+                            });
+                            localStorage.setItem('items', JSON.stringify(items));
                         }
                         if (err && !(err instanceof ZXing.NotFoundException)) {
                             console.error(err)
