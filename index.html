@@ -136,9 +136,17 @@
         filter: blur(2px);
     }
 
+    canvas {
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        display: none;
+    }
+
     textarea {
         width: 400px;
         height: 250px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
     }
 </style>
 
@@ -159,6 +167,8 @@
         <button class="btn capture" id="cauture">Capture</button>
         <canvas id="snapshot" width="400" height="300"></canvas>
         <div class="result-wrapper">
+            <progress min="0" max="1" value="0" style="width:100%; display:none;" id="ocr-progress"></progress>
+            <div id="status-text" style="text-align: center;"></div>
             <div style="display:flex;width:100%; flex-direction:column;">
                 <h4>Text Result: </h4>
                 <textarea id="result"></textarea>
@@ -190,9 +200,18 @@
             const result = document.getElementById("result");
             captureButton.addEventListener("click", function () {
                 const context = snapshot.getContext("2d");
+                snapshotZone.style['display'] = 'block';
                 context.drawImage(player, 0, 0, snapshotZone.width, snapshotZone.height);
+                document.querySelector('#ocr-progress').style['display'] = 'block';
                 Tesseract.recognize(snapshotZone, "eng", {
-                    logger: (m) => console.log(m)
+                    logger: (m) => {
+                        console.log(m);
+                        document.querySelector('#status-text').textContent = m.status;
+                        document.querySelector('#ocr-progress').value = m.progress;
+                        if (m.progress === 1 && m.status === 'recognizing text') {
+                            document.querySelector('#status-text').textContent = 'Success!';
+                        }
+                    }
                 }).then(({
                     data: {
                         text
@@ -292,6 +311,10 @@
                     const snapshotZone = document.getElementById("snapshot");
                     const context = snapshotZone.getContext('2d');
                     context.clearRect(0, 0, snapshotZone.width, snapshotZone.height);
+                    document.querySelector('#status-text').textContent = '';
+                    document.querySelector('#ocr-progress').value = 0;
+                    document.querySelector('#ocr-progress').style['display'] = 'none';
+                    snapshotZone.style['display'] = 'none';
                     console.log('Reset.')
                 })
             }).catch((err) => {
