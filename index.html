@@ -199,29 +199,10 @@
                     }
                 }) => {
                     console.log(result);
-                    result.textContent = text;
+                    result.value = text;
                 });
             });
         }
-        // function videoToText(src) {
-        //     // const src = 'https://tesseract.projectnaptha.com/img/eng_bw.png';
-        //     const worker = Tesseract.createWorker({
-        //         logger: m => console.log(m)
-        //     });
-        //     Tesseract.setLogging(true);
-        //     work();
-        //     async function
-        //     work() {
-        //         await worker.load();
-        //         await worker.loadLanguage('eng');
-        //         await worker.initialize('eng');
-        //         let result = await worker.detect(src);
-        //         console.log(result.data);
-        //         result = await worker.recognize(src);
-        //         console.log('Teseract Result: ', result.data);
-        //         await worker.terminate();
-        //     }
-        // }
     </script>
     <script type="text/javascript">
         //saved items 
@@ -299,7 +280,11 @@
                 })
                 document.getElementById('resetButton').addEventListener('click', () => {
                     codeReader.reset()
-                    document.getElementById('result').textContent = '';
+                    document.getElementById('result').value = '';
+                    document.getElementById('result2').textContent = '';
+                    const snapshotZone = document.getElementById("snapshot");
+                    const context = snapshotZone.getContext('2d');
+                    context.clearRect(0, 0, snapshotZone.width, snapshotZone.height);
                     console.log('Reset.')
                 })
             }).catch((err) => {
