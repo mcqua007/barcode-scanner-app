@@ -253,9 +253,16 @@
                                 return el.barcode === result.text
                             });
                             if (index !== -1) {
+                                var now = Date.now();
+                                var scannedTime = items[index].date;
+                                var ms = 1000 * 60 * 60 * 24;
+                                var daysBetween = Math.round((now - scannedTime) / ms);
+                                var daysBetween = (now - scannedTime) / ms;
+                                daysBetween = daysBetween < 1 ? '0' : Math.round(
+                                    daysBetween);
                                 let date = new Date(items[index].date).toLocaleString();
                                 var replace = confirm(
-                                    `This was item was last scanned - ${date} ? Do you want to replace?`
+                                    `This was item was scanned ${daysBetween} day(s) ago on: ${date}? Do you want to replace?`
                                     );
                                 if (replace) {
                                     items[index].date = result.timestamp;
